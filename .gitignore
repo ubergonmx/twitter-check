@@ -1,0 +1,48 @@
+# Environment variables and secrets
+.env
+
+# Python virtual environments
+venv/
+env/
+.venv/
+ENV/
+.python-version
+
+# Byte-compiled / optimized / DLL files
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+
+# Distribution / packaging
+dist/
+build/
+*.egg-info/
+
+# Logs and databases
+*.log
+twitter_response_logs/
+logs/
+*.db
+*.sqlite3
+
+# OS specific files
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# IDE specific files
+.idea/
+.vscode/
+*.swp
+*.swo
+
+# Output files from tool runs - commented out since these might be needed for testing
+# *.csv
+# *_metadata.json
+
+# Project specific
+# Uncomment the following lines to exclude output files when needed
+# twitter_community_members.csv
+# twitter_community_members_metadata.json
