@@ -39,10 +39,10 @@ desktop.ini
 *.swo
 
 # Output files from tool runs - commented out since these might be needed for testing
-# *.csv
-# *_metadata.json
+*.csv
+*_metadata.json
 
 # Project specific
 # Uncomment the following lines to exclude output files when needed
-# twitter_community_members.csv
-# twitter_community_members_metadata.json
+twitter_community_members.csv
+twitter_community_members_metadata.json
