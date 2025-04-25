@@ -56,6 +56,23 @@ TWITTER_LOGS_DIR=twitter_response_logs
 
 ### 3. Run the tools
 
+⚠️ **IMPORTANT:** Make sure your virtual environment is activated before running the tools (as shown in step 1)
+
+<details>
+<summary>Click to see activation instructions again</summary>
+
+```bash
+# On Windows
+venv\Scripts\activate
+
+# On macOS/Linux
+source venv/bin/activate
+
+# You'll know it's activated when you see (venv) in your terminal prompt
+# (venv) $
+```
+</details>
+
 **Scrape community members:**
 ```bash
 python get_community_members.py
