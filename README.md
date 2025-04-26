@@ -123,6 +123,8 @@ python check_followers.py --target TwitterUsername --limit 50
 python check_followers.py --target TwitterUsername --separate
 ```
 
+> **⏱️ Processing Time Note**: For large communities, expect significant processing time. Testing shows that checking followers for 10,000 community members takes approximately 7 hours to complete.
+
 ## 📊 Output Files
 
 **Community Scraper:**
