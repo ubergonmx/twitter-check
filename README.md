@@ -77,7 +77,7 @@ source venv/bin/activate
 ```bash
 python get_community_members.py
 ```
-
+å
 **Check who follows a target user:**
 ```bash
 python check_followers.py --target TwitterUsername
@@ -147,6 +147,9 @@ python check_followers.py --target TwitterUsername --separate
 - Set up cron jobs to resume scraping automatically:
   ```
   0 */6 * * * cd /path/to/twitter-check && /path/to/python get_community_members.py --continue
+  ```
+
+> **⚠️ Community Member Limitation**: Testing shows Twitter may limit the number of community members that can be retrieved. It was tested in a community with 24.4K members, only 9.5K members were retrievable before the cursor stopped returning results.
   ```
 - Monitor the logs directory for API changes or errors
 
