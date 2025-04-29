@@ -46,3 +46,6 @@ desktop.ini
 # Uncomment the following lines to exclude output files when needed
 twitter_community_members.csv
 twitter_community_members_metadata.json
+
+# cURL md files
+curl*.md
