@@ -5,9 +5,8 @@ import csv
 import sys
 import os
 import datetime
-import math
 import re
-from colorama import init, Fore, Back, Style
+from colorama import init, Fore, Style
 from dotenv import load_dotenv
 
 # Initialize colorama for cross-platform colored terminal output

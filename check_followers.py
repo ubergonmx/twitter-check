@@ -33,9 +33,7 @@ def get_visible_length(text):
 
 
 class TwitterFollowerChecker:
-    def __init__(
-        self, auth_token=None, csrf_token=None, logs_dir="twitter_response_logs"
-    ):
+    def __init__(self, auth_token=None, csrf_token=None, logs_dir="twitter_response_logs"):
         """
         Initialize the Twitter Follower Checker
 
@@ -74,9 +72,7 @@ class TwitterFollowerChecker:
         self.auth_token = auth_token or os.getenv("TWITTER_AUTH_TOKEN", "")
         self.csrf_token = csrf_token or os.getenv("TWITTER_CSRF_TOKEN", "")
         self.logs_dir = logs_dir
-        self.following_api_url = (
-            "https://x.com/i/api/graphql/zx6e-TLzRkeDO_a7p4b3JQ/Following"
-        )
+        self.following_api_url = "https://x.com/i/api/graphql/zx6e-TLzRkeDO_a7p4b3JQ/Following"
 
         # Create logs directory if it doesn't exist
         os.makedirs(logs_dir, exist_ok=True)
@@ -176,9 +172,7 @@ class TwitterFollowerChecker:
             # Handle rate limiting
             if response.status_code == 429:
                 self.rate_limit_hits += 1
-                wait_time = min(
-                    60 * (2**self.rate_limit_hits), 600
-                )  # Exponential backoff up to 10 minutes
+                wait_time = min(60 * (2**self.rate_limit_hits), 600)  # Exponential backoff up to 10 minutes
                 print(
                     f"{Back.YELLOW}{Fore.BLACK} RATE LIMIT {Style.RESET_ALL} Waiting {Style.BRIGHT}{wait_time}s{Style.RESET_ALL} before retrying..."
                 )
@@ -198,9 +192,7 @@ class TwitterFollowerChecker:
 
             # Log the raw response
             timestamp = datetime.datetime.now().strftime("%Y%m%d_%H%M%S")
-            log_filename = (
-                f"{self.logs_dir}/following_response_{user_id}_{timestamp}.json"
-            )
+            log_filename = f"{self.logs_dir}/following_response_{user_id}_{timestamp}.json"
             with open(log_filename, "w", encoding="utf-8") as log_file:
                 json.dump(data, log_file, indent=4)
 
@@ -225,28 +217,16 @@ class TwitterFollowerChecker:
                                 if content.get("entryType") == "TimelineTimelineItem":
                                     item_content = content.get("itemContent", {})
                                     if item_content.get("itemType") == "TimelineUser":
-                                        user_result = item_content.get(
-                                            "user_results", {}
-                                        ).get("result", {})
+                                        user_result = item_content.get("user_results", {}).get("result", {})
 
-                                        if (
-                                            user_result
-                                            and user_result.get("__typename") == "User"
-                                        ):
-                                            screen_name = user_result.get(
-                                                "legacy", {}
-                                            ).get("screen_name", "")
-                                            if (
-                                                screen_name.lower()
-                                                == target_username.lower()
-                                            ):
+                                        if user_result and user_result.get("__typename") == "User":
+                                            screen_name = user_result.get("legacy", {}).get("screen_name", "")
+                                            if screen_name.lower() == target_username.lower():
                                                 # Remove this log as we'll have a prettier formatted message in the caller
                                                 return True
 
             except Exception as e:
-                print(
-                    f"{Back.RED}{Fore.WHITE} ERROR {Style.RESET_ALL} Parsing following data: {str(e)}"
-                )
+                print(f"{Back.RED}{Fore.WHITE} ERROR {Style.RESET_ALL} Parsing following data: {str(e)}")
                 return None
 
             # If we reach here, we didn't find the target in the user's followings
@@ -254,16 +234,12 @@ class TwitterFollowerChecker:
             return False
 
         except requests.exceptions.Timeout:
-            print(
-                f"{Back.YELLOW}{Fore.BLACK} TIMEOUT {Style.RESET_ALL} Request timed out. Retrying after 10s..."
-            )
+            print(f"{Back.YELLOW}{Fore.BLACK} TIMEOUT {Style.RESET_ALL} Request timed out. Retrying after 10s...")
             time.sleep(10)
             return self.check_if_following(user_id, target_username)
 
         except requests.exceptions.ConnectionError:
-            print(
-                f"{Back.YELLOW}{Fore.BLACK} CONNECTION {Style.RESET_ALL} Network error. Retrying after 15s..."
-            )
+            print(f"{Back.YELLOW}{Fore.BLACK} CONNECTION {Style.RESET_ALL} Network error. Retrying after 15s...")
             time.sleep(15)
             return self.check_if_following(user_id, target_username)
 
@@ -313,9 +289,7 @@ class TwitterFollowerChecker:
                 for row in reader:
                     members.append(row)
         except Exception as e:
-            print(
-                f"{Back.RED}{Fore.WHITE} ERROR {Style.RESET_ALL} Reading CSV: {str(e)}"
-            )
+            print(f"{Back.RED}{Fore.WHITE} ERROR {Style.RESET_ALL} Reading CSV: {str(e)}")
             return [], []
 
         total_members = len(members)
@@ -340,9 +314,7 @@ class TwitterFollowerChecker:
             # Determine which file to check for previously processed users
             if separate:
                 following_output = f"{base_name}_following_{target_username}.csv"
-                not_following_output = (
-                    f"{base_name}_not_following_{target_username}.csv"
-                )
+                not_following_output = f"{base_name}_not_following_{target_username}.csv"
 
                 # Try to load from both files
                 for output_file_path in [following_output, not_following_output]:
@@ -474,21 +446,13 @@ class TwitterFollowerChecker:
                 remaining_users = len(members) - (i - 1)
                 if continue_scan:
                     # Count how many users still need to be processed (excluding already processed ones)
-                    remaining_users = sum(
-                        1
-                        for m in members[i - 1 :]
-                        if m.get("username") not in processed_usernames
-                    )
+                    remaining_users = sum(1 for m in members[i - 1 :] if m.get("username") not in processed_usernames)
 
                 # Calculate estimated time based on processed items in this session
                 # rather than the loop counter which includes skipped items
-                remaining = (
-                    remaining_users / items_per_second if items_per_second > 0 else 0
-                )
+                remaining = remaining_users / items_per_second if items_per_second > 0 else 0
                 time_remaining = str(datetime.timedelta(seconds=int(remaining)))
-                progress_bar = "█" * int(percent_complete / 4) + "░" * (
-                    25 - int(percent_complete / 4)
-                )
+                progress_bar = "█" * int(percent_complete / 4) + "░" * (25 - int(percent_complete / 4))
 
                 # Handle target username display
                 target_user_text = f"Target: @{target_username}"
@@ -501,9 +465,7 @@ class TwitterFollowerChecker:
 
                 # Format progress and ETA with proper padding
                 progress_text = f"Progress: [{progress_bar}] {percent_complete:.1f}%"
-                progress_padding = get_padding(
-                    len(progress_text.replace("\033", "")), box_width
-                )
+                progress_padding = get_padding(len(progress_text.replace("\033", "")), box_width)
 
                 eta_text = f"ETA: {time_remaining}"
                 eta_padding = get_padding(len(eta_text), box_width)
@@ -568,23 +530,17 @@ class TwitterFollowerChecker:
                 entry = {"username": username, "follows_target": "Unknown"}
                 not_following.append(entry)
                 # Include the status in the progress_stats to show in the progress box
-                progress_stats = (
-                    f"Last: {Fore.YELLOW}⚠ Unknown{Style.RESET_ALL} @{username}"
-                )
+                progress_stats = f"Last: {Fore.YELLOW}⚠ Unknown{Style.RESET_ALL} @{username}"
             elif follows:
                 entry = {"username": username, "follows_target": "Yes"}
                 following.append(entry)
                 # Include the status in the progress_stats to show in the progress box
-                progress_stats = (
-                    f"Last: {Fore.GREEN}✓ Following{Style.RESET_ALL} @{username}"
-                )
+                progress_stats = f"Last: {Fore.GREEN}✓ Following{Style.RESET_ALL} @{username}"
             else:
                 entry = {"username": username, "follows_target": "No"}
                 not_following.append(entry)
                 # Include the status in the progress_stats to show in the progress box
-                progress_stats = (
-                    f"Last: {Fore.RED}✗ Not Following{Style.RESET_ALL} @{username}"
-                )
+                progress_stats = f"Last: {Fore.RED}✗ Not Following{Style.RESET_ALL} @{username}"
 
             # Save progress periodically (every 5 users)
             if i % 5 == 0 or i == len(members):
@@ -606,9 +562,7 @@ class TwitterFollowerChecker:
                 else:
                     # Combine both lists for single file output
                     all_results = not_following + following
-                    self._save_results(
-                        all_results, output_file, append_mode=continue_scan
-                    )
+                    self._save_results(all_results, output_file, append_mode=continue_scan)
                     # This will be shown in the progress bar, no need for a separate print
                     progress_stats = f"{len(all_results)} total ({Fore.GREEN}{len(following)}{Style.RESET_ALL}/{Fore.RED}{len(not_following)}{Style.RESET_ALL})"
 
@@ -620,9 +574,7 @@ class TwitterFollowerChecker:
         hours, remainder = divmod(execution_time, 3600)
         minutes, seconds = divmod(remainder, 60)
         execution_time_str = f"{int(hours)}h {int(minutes)}m {int(seconds)}s"
-        items_per_minute = (
-            len(members) / (execution_time / 60) if execution_time > 0 else 0
-        )
+        items_per_minute = len(members) / (execution_time / 60) if execution_time > 0 else 0
 
         # Final save
         if separate:
@@ -642,9 +594,7 @@ class TwitterFollowerChecker:
             # Clear console for the final report
             os.system("clear" if os.name == "posix" else "cls")
 
-            print(
-                f"\n{Back.GREEN}{Fore.WHITE} SUCCESS {Style.RESET_ALL} Processing complete!"
-            )
+            print(f"\n{Back.GREEN}{Fore.WHITE} SUCCESS {Style.RESET_ALL} Processing complete!")
 
             # Show fancy summary box
             summary_width = 58
@@ -652,94 +602,68 @@ class TwitterFollowerChecker:
 
             title = f"{Fore.WHITE}{Style.BRIGHT}📊SUMMARY REPORT{Style.RESET_ALL}"
             title_padding = summary_padding(get_visible_length("📊SUMMARY REPORT"))
-            print(
-                f"{Fore.BLUE}┃{Style.RESET_ALL}  {title}{' ' * title_padding}{Fore.BLUE}┃{Style.RESET_ALL}"
-            )
+            print(f"{Fore.BLUE}┃{Style.RESET_ALL}  {title}{' ' * title_padding}{Fore.BLUE}┃{Style.RESET_ALL}")
 
             print(f"{Fore.BLUE}┣{'━' * summary_width}┫{Style.RESET_ALL}")
 
             # Target
             target_content = f"{Fore.CYAN}Target:{Style.RESET_ALL} {Style.BRIGHT}@{target_username}{Style.RESET_ALL}"
-            target_padding = summary_padding(
-                get_visible_length(f"Target: @{target_username}")
-            )
-            print(
-                f"{Fore.BLUE}┃{Style.RESET_ALL}  {target_content}{' ' * target_padding}{Fore.BLUE}┃{Style.RESET_ALL}"
-            )
+            target_padding = summary_padding(get_visible_length(f"Target: @{target_username}"))
+            print(f"{Fore.BLUE}┃{Style.RESET_ALL}  {target_content}{' ' * target_padding}{Fore.BLUE}┃{Style.RESET_ALL}")
 
             # Total members
-            total_content = f"{Fore.CYAN}Total members processed:{Style.RESET_ALL} {Style.BRIGHT}{len(members)}{Style.RESET_ALL}"
-            total_padding = summary_padding(
-                get_visible_length(f"Total members processed: {len(members)}")
+            total_content = (
+                f"{Fore.CYAN}Total members processed:{Style.RESET_ALL} {Style.BRIGHT}{len(members)}{Style.RESET_ALL}"
             )
-            print(
-                f"{Fore.BLUE}┃{Style.RESET_ALL}  {total_content}{' ' * total_padding}{Fore.BLUE}┃{Style.RESET_ALL}"
-            )
+            total_padding = summary_padding(get_visible_length(f"Total members processed: {len(members)}"))
+            print(f"{Fore.BLUE}┃{Style.RESET_ALL}  {total_content}{' ' * total_padding}{Fore.BLUE}┃{Style.RESET_ALL}")
 
             # Following
             following_stats = f"{Fore.CYAN}Members following:{Style.RESET_ALL} {Fore.GREEN}{Style.BRIGHT}{len(following)}{Style.RESET_ALL}"
-            following_padding = summary_padding(
-                get_visible_length(f"Members following: {len(following)}")
-            )
+            following_padding = summary_padding(get_visible_length(f"Members following: {len(following)}"))
             print(
                 f"{Fore.BLUE}┃{Style.RESET_ALL}  {following_stats}{' ' * following_padding}{Fore.BLUE}┃{Style.RESET_ALL}"
             )
 
             # Not following
             not_following_stats = f"{Fore.CYAN}Members not following:{Style.RESET_ALL} {Fore.RED}{Style.BRIGHT}{len(not_following)}{Style.RESET_ALL}"
-            not_following_padding = summary_padding(
-                get_visible_length(f"Members not following: {len(not_following)}")
-            )
+            not_following_padding = summary_padding(get_visible_length(f"Members not following: {len(not_following)}"))
             print(
                 f"{Fore.BLUE}┃{Style.RESET_ALL}  {not_following_stats}{' ' * not_following_padding}{Fore.BLUE}┃{Style.RESET_ALL}"
             )
 
             # Processing time
-            time_content = (
-                f"{Fore.CYAN}Processing time:{Style.RESET_ALL} {execution_time_str}"
-            )
-            time_padding = summary_padding(
-                get_visible_length(f"Processing time: {execution_time_str}")
-            )
-            print(
-                f"{Fore.BLUE}┃{Style.RESET_ALL}  {time_content}{' ' * time_padding}{Fore.BLUE}┃{Style.RESET_ALL}"
-            )
+            time_content = f"{Fore.CYAN}Processing time:{Style.RESET_ALL} {execution_time_str}"
+            time_padding = summary_padding(get_visible_length(f"Processing time: {execution_time_str}"))
+            print(f"{Fore.BLUE}┃{Style.RESET_ALL}  {time_content}{' ' * time_padding}{Fore.BLUE}┃{Style.RESET_ALL}")
 
             # Processing rate
             rate_text = f"{items_per_minute:.1f} members/minute"
             rate_content = f"{Fore.CYAN}Processing rate:{Style.RESET_ALL} {rate_text}"
-            rate_padding = summary_padding(
-                get_visible_length(f"Processing rate: {rate_text}")
-            )
-            print(
-                f"{Fore.BLUE}┃{Style.RESET_ALL}  {rate_content}{' ' * rate_padding}{Fore.BLUE}┃{Style.RESET_ALL}"
-            )
+            rate_padding = summary_padding(get_visible_length(f"Processing rate: {rate_text}"))
+            print(f"{Fore.BLUE}┃{Style.RESET_ALL}  {rate_content}{' ' * rate_padding}{Fore.BLUE}┃{Style.RESET_ALL}")
 
             print(f"{Fore.BLUE}┣{'━' * summary_width}┫{Style.RESET_ALL}")
 
             # Output files section
             files_title = f"{Fore.WHITE}{Style.BRIGHT}💾OUTPUT FILE{Style.RESET_ALL}"
             files_padding = summary_padding(get_visible_length("💾OUTPUT FILE"))
-            print(
-                f"{Fore.BLUE}┃{Style.RESET_ALL}  {files_title}{' ' * files_padding}{Fore.BLUE}┃{Style.RESET_ALL}"
-            )
+            print(f"{Fore.BLUE}┃{Style.RESET_ALL}  {files_title}{' ' * files_padding}{Fore.BLUE}┃{Style.RESET_ALL}")
 
             # Following file
             wrapped_following_output = wrap_text(following_output)
-            follow_file = f"{Fore.GREEN}➤{Style.RESET_ALL} Following: {Style.BRIGHT}{wrapped_following_output}{Style.RESET_ALL}"
-            follow_padding = summary_padding(
-                get_visible_length(f"➤ Following: {wrapped_following_output}")
+            follow_file = (
+                f"{Fore.GREEN}➤{Style.RESET_ALL} Following: {Style.BRIGHT}{wrapped_following_output}{Style.RESET_ALL}"
             )
-            print(
-                f"{Fore.BLUE}┃{Style.RESET_ALL}  {follow_file}{' ' * follow_padding}{Fore.BLUE}┃{Style.RESET_ALL}"
-            )
+            follow_padding = summary_padding(get_visible_length(f"➤ Following: {wrapped_following_output}"))
+            print(f"{Fore.BLUE}┃{Style.RESET_ALL}  {follow_file}{' ' * follow_padding}{Fore.BLUE}┃{Style.RESET_ALL}")
 
             # Not following file
             wrapped_not_following = wrap_text(not_following_output)
-            nofollow_file = f"{Fore.RED}➤{Style.RESET_ALL} Not following: {Style.BRIGHT}{wrapped_not_following}{Style.RESET_ALL}"
-            nofollow_padding = summary_padding(
-                get_visible_length(f"➤ Not following: {wrapped_not_following}")
+            nofollow_file = (
+                f"{Fore.RED}➤{Style.RESET_ALL} Not following: {Style.BRIGHT}{wrapped_not_following}{Style.RESET_ALL}"
             )
+            nofollow_padding = summary_padding(get_visible_length(f"➤ Not following: {wrapped_not_following}"))
             print(
                 f"{Fore.BLUE}┃{Style.RESET_ALL}  {nofollow_file}{' ' * nofollow_padding}{Fore.BLUE}┃{Style.RESET_ALL}"
             )
@@ -753,9 +677,7 @@ class TwitterFollowerChecker:
             # Clear console for the final report
             os.system("clear" if os.name == "posix" else "cls")
 
-            print(
-                f"\n{Back.GREEN}{Fore.WHITE} SUCCESS {Style.RESET_ALL} Processing complete!"
-            )
+            print(f"\n{Back.GREEN}{Fore.WHITE} SUCCESS {Style.RESET_ALL} Processing complete!")
 
             # Show fancy summary box
             summary_width = 58
@@ -763,87 +685,59 @@ class TwitterFollowerChecker:
 
             title = f"{Fore.WHITE}{Style.BRIGHT}📊SUMMARY REPORT{Style.RESET_ALL}"
             title_padding = summary_padding(get_visible_length("📊SUMMARY REPORT"))
-            print(
-                f"{Fore.BLUE}┃{Style.RESET_ALL}  {title}{' ' * title_padding}{Fore.BLUE}┃{Style.RESET_ALL}"
-            )
+            print(f"{Fore.BLUE}┃{Style.RESET_ALL}  {title}{' ' * title_padding}{Fore.BLUE}┃{Style.RESET_ALL}")
 
             print(f"{Fore.BLUE}┣{'━' * summary_width}┫{Style.RESET_ALL}")
 
             # Target
             target_content = f"{Fore.CYAN}Target:{Style.RESET_ALL} {Style.BRIGHT}@{target_username}{Style.RESET_ALL}"
-            target_padding = summary_padding(
-                get_visible_length(f"Target: @{target_username}")
-            )
-            print(
-                f"{Fore.BLUE}┃{Style.RESET_ALL}  {target_content}{' ' * target_padding}{Fore.BLUE}┃{Style.RESET_ALL}"
-            )
+            target_padding = summary_padding(get_visible_length(f"Target: @{target_username}"))
+            print(f"{Fore.BLUE}┃{Style.RESET_ALL}  {target_content}{' ' * target_padding}{Fore.BLUE}┃{Style.RESET_ALL}")
 
             # Total members
-            total_content = f"{Fore.CYAN}Total members processed:{Style.RESET_ALL} {Style.BRIGHT}{len(members)}{Style.RESET_ALL}"
-            total_padding = summary_padding(
-                get_visible_length(f"Total members processed: {len(members)}")
+            total_content = (
+                f"{Fore.CYAN}Total members processed:{Style.RESET_ALL} {Style.BRIGHT}{len(members)}{Style.RESET_ALL}"
             )
-            print(
-                f"{Fore.BLUE}┃{Style.RESET_ALL}  {total_content}{' ' * total_padding}{Fore.BLUE}┃{Style.RESET_ALL}"
-            )
+            total_padding = summary_padding(get_visible_length(f"Total members processed: {len(members)}"))
+            print(f"{Fore.BLUE}┃{Style.RESET_ALL}  {total_content}{' ' * total_padding}{Fore.BLUE}┃{Style.RESET_ALL}")
 
             # Following
             following_stats = f"{Fore.CYAN}Members following:{Style.RESET_ALL} {Fore.GREEN}{Style.BRIGHT}{len(following)}{Style.RESET_ALL}"
-            following_padding = summary_padding(
-                get_visible_length(f"Members following: {len(following)}")
-            )
+            following_padding = summary_padding(get_visible_length(f"Members following: {len(following)}"))
             print(
                 f"{Fore.BLUE}┃{Style.RESET_ALL}  {following_stats}{' ' * following_padding}{Fore.BLUE}┃{Style.RESET_ALL}"
             )
 
             # Not following
             not_following_stats = f"{Fore.CYAN}Members not following:{Style.RESET_ALL} {Fore.RED}{Style.BRIGHT}{len(not_following)}{Style.RESET_ALL}"
-            not_following_padding = summary_padding(
-                get_visible_length(f"Members not following: {len(not_following)}")
-            )
+            not_following_padding = summary_padding(get_visible_length(f"Members not following: {len(not_following)}"))
             print(
                 f"{Fore.BLUE}┃{Style.RESET_ALL}  {not_following_stats}{' ' * not_following_padding}{Fore.BLUE}┃{Style.RESET_ALL}"
             )
 
             # Processing time
-            time_content = (
-                f"{Fore.CYAN}Processing time:{Style.RESET_ALL} {execution_time_str}"
-            )
-            time_padding = summary_padding(
-                get_visible_length(f"Processing time: {execution_time_str}")
-            )
-            print(
-                f"{Fore.BLUE}┃{Style.RESET_ALL}  {time_content}{' ' * time_padding}{Fore.BLUE}┃{Style.RESET_ALL}"
-            )
+            time_content = f"{Fore.CYAN}Processing time:{Style.RESET_ALL} {execution_time_str}"
+            time_padding = summary_padding(get_visible_length(f"Processing time: {execution_time_str}"))
+            print(f"{Fore.BLUE}┃{Style.RESET_ALL}  {time_content}{' ' * time_padding}{Fore.BLUE}┃{Style.RESET_ALL}")
 
             # Processing rate
             rate_text = f"{items_per_minute:.1f} members/minute"
             rate_content = f"{Fore.CYAN}Processing rate:{Style.RESET_ALL} {rate_text}"
-            rate_padding = summary_padding(
-                get_visible_length(f"Processing rate: {rate_text}")
-            )
-            print(
-                f"{Fore.BLUE}┃{Style.RESET_ALL}  {rate_content}{' ' * rate_padding}{Fore.BLUE}┃{Style.RESET_ALL}"
-            )
+            rate_padding = summary_padding(get_visible_length(f"Processing rate: {rate_text}"))
+            print(f"{Fore.BLUE}┃{Style.RESET_ALL}  {rate_content}{' ' * rate_padding}{Fore.BLUE}┃{Style.RESET_ALL}")
 
             print(f"{Fore.BLUE}┣{'━' * summary_width}┫{Style.RESET_ALL}")
 
             # Output file section
             file_title = f"{Fore.WHITE}{Style.BRIGHT}💾OUTPUT FILE{Style.RESET_ALL}"
             file_title_padding = summary_padding(get_visible_length("💾OUTPUT FILE"))
-            print(
-                f"{Fore.BLUE}┃{Style.RESET_ALL}  {file_title}{' ' * file_title_padding}{Fore.BLUE}┃{Style.RESET_ALL}"
-            )
+            print(f"{Fore.BLUE}┃{Style.RESET_ALL}  {file_title}{' ' * file_title_padding}{Fore.BLUE}┃{Style.RESET_ALL}")
 
             # Result file
             wrapped_output_file = wrap_text(output_file)
             result_file = f"{Fore.BLUE}➤{Style.RESET_ALL} Results: {Style.BRIGHT}{wrapped_output_file}{Style.RESET_ALL}"
-            result_padding = summary_padding(
-                get_visible_length(f"➤ Results: {wrapped_output_file}")
-            )
-            print(
-                f"{Fore.BLUE}┃{Style.RESET_ALL}  {result_file}{' ' * result_padding}{Fore.BLUE}┃{Style.RESET_ALL}"
-            )
+            result_padding = summary_padding(get_visible_length(f"➤ Results: {wrapped_output_file}"))
+            print(f"{Fore.BLUE}┃{Style.RESET_ALL}  {result_file}{' ' * result_padding}{Fore.BLUE}┃{Style.RESET_ALL}")
 
             print(f"{Fore.BLUE}┗{'━' * summary_width}┛{Style.RESET_ALL}")
 
@@ -881,9 +775,7 @@ class TwitterFollowerChecker:
                         for row in reader:
                             existing_usernames.add(row["username"])
             except Exception as e:
-                print(
-                    f"{Back.YELLOW}{Fore.BLACK} WARNING {Style.RESET_ALL} Error reading existing file: {str(e)}"
-                )
+                print(f"{Back.YELLOW}{Fore.BLACK} WARNING {Style.RESET_ALL} Error reading existing file: {str(e)}")
                 # If we can't read the existing file, we'll continue but might have duplicates
 
         try:
@@ -893,10 +785,7 @@ class TwitterFollowerChecker:
                 with open(output_file, mode, encoding="utf-8") as f:
                     for user in users:
                         # Only write if username isn't already in the file
-                        if (
-                            not append_mode
-                            or user["username"] not in existing_usernames
-                        ):
+                        if not append_mode or user["username"] not in existing_usernames:
                             f.write(f"{user['username']}\n")
             else:
                 # CSV file with username and follows_target columns
@@ -904,11 +793,7 @@ class TwitterFollowerChecker:
 
                 # Filter out users that are already in the file to avoid duplicates
                 if append_mode:
-                    users_to_write = [
-                        user
-                        for user in users
-                        if user["username"] not in existing_usernames
-                    ]
+                    users_to_write = [user for user in users if user["username"] not in existing_usernames]
                 else:
                     users_to_write = users
 
@@ -920,9 +805,7 @@ class TwitterFollowerChecker:
                     writer.writerows(users_to_write)
 
         except Exception as e:
-            print(
-                f"{Back.RED}{Fore.WHITE} ERROR {Style.RESET_ALL} Saving results: {str(e)}"
-            )
+            print(f"{Back.RED}{Fore.WHITE} ERROR {Style.RESET_ALL} Saving results: {str(e)}")
 
 
 def main():
@@ -930,9 +813,7 @@ def main():
     os.system("clear" if os.name == "posix" else "cls")
 
     # Set up command line arguments
-    parser = argparse.ArgumentParser(
-        description="Check which Twitter community members don't follow a specific user"
-    )
+    parser = argparse.ArgumentParser(description="Check which Twitter community members don't follow a specific user")
 
     parser.add_argument(
         "--input",
@@ -946,9 +827,7 @@ def main():
         required=True,
         help="Target Twitter username to check if members follow (without the @ symbol)",
     )
-    parser.add_argument(
-        "--limit", type=int, help="Limit the number of members to process"
-    )
+    parser.add_argument("--limit", type=int, help="Limit the number of members to process")
     parser.add_argument(
         "--output",
         type=str,
@@ -982,12 +861,8 @@ def main():
 
     # Verify auth tokens are provided through CLI or environment variables
     if not args.auth_token or not args.csrf_token:
-        print(
-            f"{Fore.RED}Error:{Style.RESET_ALL} Twitter authentication tokens not found."
-        )
-        print(
-            "Please provide auth-token and csrf-token using command line arguments or environment variables."
-        )
+        print(f"{Fore.RED}Error:{Style.RESET_ALL} Twitter authentication tokens not found.")
+        print("Please provide auth-token and csrf-token using command line arguments or environment variables.")
         print(
             f"You can copy the {Fore.CYAN}.env.example{Style.RESET_ALL} file to {Fore.CYAN}.env{Style.RESET_ALL} and fill in your values."
         )
