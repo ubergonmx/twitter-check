@@ -124,6 +124,8 @@ python check_followers.py --target TwitterUsername --separate
 ```
 
 > **⏱️ Processing Time Note**: For large communities, expect significant processing time. Testing shows that checking followers for 10,000 community members takes approximately 7 hours to complete.
+>
+> **💾 File Protection**: If output files already exist and contain data, the tool will prompt you to continue from where you left off or overwrite the existing files. This helps prevent accidental data loss when you forget to use the `--continue` flag.
 
 ## 📊 Output Files
 
@@ -162,6 +164,13 @@ python check_followers.py --target TwitterUsername --separate
 **Authentication Errors:**
 - Your tokens may have expired - get fresh tokens
 - Twitter may have updated their API
+
+**Existing Output Files:**
+- When you run the checker tool and output files already exist (but you forgot to use `--continue`), 
+  the tool will detect this and prompt you with options:
+  1. Continue from where you left off (recommended)
+  2. Overwrite existing files (will lose previous progress)
+- This helps prevent accidental data loss when running long processes
 
 **Missing Data:**
 - Check if the community is private and your account has access

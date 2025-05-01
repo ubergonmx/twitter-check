@@ -32,6 +32,36 @@ def get_visible_length(text):
     return len(ansi_escape.sub("", text))
 
 
+# Helper function to prompt the user for confirmation
+def prompt_user_for_confirmation(message, default="n"):
+    """Prompt the user for confirmation
+
+    Args:
+        message: Message to display to the user
+        default: Default response if user just presses Enter ('y' or 'n')
+
+    Returns:
+        bool: True if user confirms, False otherwise
+    """
+    valid_responses = {"y": True, "yes": True, "n": False, "no": False}
+
+    if default.lower() not in ["y", "n"]:
+        default = "n"  # Set a safe default
+
+    prompt_options = "[Y/n]" if default.lower() == "y" else "[y/N]"
+
+    while True:
+        sys.stdout.write(f"{message} {prompt_options} ")
+        choice = input().lower()
+
+        if choice == "":
+            return valid_responses[default.lower()]
+        elif choice in valid_responses:
+            return valid_responses[choice]
+        else:
+            print(f"{Fore.YELLOW}Please respond with 'y' or 'n' (or press Enter for default).{Style.RESET_ALL}")
+
+
 class TwitterFollowerChecker:
     def __init__(self, auth_token=None, csrf_token=None, logs_dir="twitter_response_logs"):
         """
@@ -276,10 +306,62 @@ class TwitterFollowerChecker:
             # When using separate files, ignore any output_file parameter
             following_output = f"{base_name}_following_{target_username}.csv"
             not_following_output = f"{base_name}_not_following_{target_username}.csv"
+
+            # Check if output files already exist and contain data
+            existing_files = []
+            if os.path.exists(following_output) and os.path.getsize(following_output) > 0:
+                existing_files.append(following_output)
+            if os.path.exists(not_following_output) and os.path.getsize(not_following_output) > 0:
+                existing_files.append(not_following_output)
+
+            if existing_files and not continue_scan:
+                # Files exist but --continue flag wasn't used
+                print(f"\n{Back.YELLOW}{Fore.BLACK} WARNING {Style.RESET_ALL} Output file(s) already exist:")
+                for file in existing_files:
+                    print(f"  - {Style.BRIGHT}{file}{Style.RESET_ALL}")
+
+                print(f"\nYou have two options:")
+                print(f"  1. {Fore.GREEN}Continue{Style.RESET_ALL} from where you left off (use --continue flag)")
+                print(f"  2. {Fore.RED}Overwrite{Style.RESET_ALL} existing files (all progress will be lost)")
+
+                if prompt_user_for_confirmation("Continue from where you left off?", default="y"):
+                    # User chose to continue - set continue_scan to True
+                    continue_scan = True
+                    print(f"{Back.GREEN}{Fore.WHITE} INFO {Style.RESET_ALL} Continuing from previous progress")
+                else:
+                    # User chose to overwrite
+                    if not prompt_user_for_confirmation(
+                        f"{Fore.RED}Are you sure you want to overwrite existing files?{Style.RESET_ALL}", default="n"
+                    ):
+                        print(f"{Fore.YELLOW}Operation cancelled by user.{Style.RESET_ALL}")
+                        return [], []
+                    print(f"{Back.YELLOW}{Fore.BLACK} WARNING {Style.RESET_ALL} Existing files will be overwritten")
         else:
             # When using a single file, use the provided output_file or default
             if not output_file:
                 output_file = f"{base_name}_follows_{target_username}.csv"
+
+            # Check if output file already exists and contains data
+            if os.path.exists(output_file) and os.path.getsize(output_file) > 0 and not continue_scan:
+                print(f"\n{Back.YELLOW}{Fore.BLACK} WARNING {Style.RESET_ALL} Output file already exists:")
+                print(f"  - {Style.BRIGHT}{output_file}{Style.RESET_ALL}")
+
+                print(f"\nYou have two options:")
+                print(f"  1. {Fore.GREEN}Continue{Style.RESET_ALL} from where you left off (use --continue flag)")
+                print(f"  2. {Fore.RED}Overwrite{Style.RESET_ALL} existing file (all progress will be lost)")
+
+                if prompt_user_for_confirmation("Continue from where you left off?", default="y"):
+                    # User chose to continue - set continue_scan to True
+                    continue_scan = True
+                    print(f"{Back.GREEN}{Fore.WHITE} INFO {Style.RESET_ALL} Continuing from previous progress")
+                else:
+                    # User chose to overwrite
+                    if not prompt_user_for_confirmation(
+                        f"{Fore.RED}Are you sure you want to overwrite the existing file?{Style.RESET_ALL}", default="n"
+                    ):
+                        print(f"{Fore.YELLOW}Operation cancelled by user.{Style.RESET_ALL}")
+                        return [], []
+                    print(f"{Back.YELLOW}{Fore.BLACK} WARNING {Style.RESET_ALL} Existing file will be overwritten")
 
         # Read community members
         members = []
