@@ -469,7 +469,7 @@ class TwitterFollowerChecker:
             return max(0, 58 - content_len - 2)
 
         # Function to wrap long text for summary box (mainly for filenames)
-        def wrap_text(text, max_width=50):
+        def wrap_text(text, max_width=45):
             """Wrap text to fit within a maximum width
 
             Args:
@@ -682,8 +682,8 @@ class TwitterFollowerChecker:
             summary_width = 58
             print(f"\n{Fore.BLUE}┏{'━' * summary_width}┓{Style.RESET_ALL}")
 
-            title = f"{Fore.WHITE}{Style.BRIGHT}📊SUMMARY REPORT{Style.RESET_ALL}"
-            title_padding = summary_padding(get_visible_length("📊SUMMARY REPORT"))
+            title = f"{Fore.WHITE}{Style.BRIGHT}SUMMARY REPORT{Style.RESET_ALL}"
+            title_padding = summary_padding(get_visible_length("SUMMARY REPORT"))
             print(f"{Fore.BLUE}┃{Style.RESET_ALL}  {title}{' ' * title_padding}{Fore.BLUE}┃{Style.RESET_ALL}")
 
             print(f"{Fore.BLUE}┣{'━' * summary_width}┫{Style.RESET_ALL}")
@@ -728,8 +728,8 @@ class TwitterFollowerChecker:
             print(f"{Fore.BLUE}┣{'━' * summary_width}┫{Style.RESET_ALL}")
 
             # Output files section
-            files_title = f"{Fore.WHITE}{Style.BRIGHT}💾OUTPUT FILE{Style.RESET_ALL}"
-            files_padding = summary_padding(get_visible_length("💾OUTPUT FILE"))
+            files_title = f"{Fore.WHITE}{Style.BRIGHT}OUTPUT FILE{Style.RESET_ALL}"
+            files_padding = summary_padding(get_visible_length("OUTPUT FILE"))
             print(f"{Fore.BLUE}┃{Style.RESET_ALL}  {files_title}{' ' * files_padding}{Fore.BLUE}┃{Style.RESET_ALL}")
 
             # Following file
@@ -765,8 +765,8 @@ class TwitterFollowerChecker:
             summary_width = 58
             print(f"\n{Fore.BLUE}┏{'━' * summary_width}┓{Style.RESET_ALL}")
 
-            title = f"{Fore.WHITE}{Style.BRIGHT}📊SUMMARY REPORT{Style.RESET_ALL}"
-            title_padding = summary_padding(get_visible_length("📊SUMMARY REPORT"))
+            title = f"{Fore.WHITE}{Style.BRIGHT}SUMMARY REPORT{Style.RESET_ALL}"
+            title_padding = summary_padding(get_visible_length("SUMMARY REPORT"))
             print(f"{Fore.BLUE}┃{Style.RESET_ALL}  {title}{' ' * title_padding}{Fore.BLUE}┃{Style.RESET_ALL}")
 
             print(f"{Fore.BLUE}┣{'━' * summary_width}┫{Style.RESET_ALL}")
@@ -811,8 +811,8 @@ class TwitterFollowerChecker:
             print(f"{Fore.BLUE}┣{'━' * summary_width}┫{Style.RESET_ALL}")
 
             # Output file section
-            file_title = f"{Fore.WHITE}{Style.BRIGHT}💾OUTPUT FILE{Style.RESET_ALL}"
-            file_title_padding = summary_padding(get_visible_length("💾OUTPUT FILE"))
+            file_title = f"{Fore.WHITE}{Style.BRIGHT}OUTPUT FILE{Style.RESET_ALL}"
+            file_title_padding = summary_padding(get_visible_length("OUTPUT FILE"))
             print(f"{Fore.BLUE}┃{Style.RESET_ALL}  {file_title}{' ' * file_title_padding}{Fore.BLUE}┃{Style.RESET_ALL}")
 
             # Result file
